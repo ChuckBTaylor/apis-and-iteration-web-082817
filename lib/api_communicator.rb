@@ -25,12 +25,13 @@ def get_character_movies_from_api(character)
 end
 
 def parse_character_movies(film_array)
-  neat_films = []
+  neat_films = {}
   film_array.each do |url|
     movie = RestClient.get("#{url}")
-    neat_films.push(JSON.parse(movie)["title"])
+    neat_films[url[-2] = JSON.parse(movie)["title"])
   end
   neat_films
+  binding.pry
 end
 
 def print_movies(movie_array)
