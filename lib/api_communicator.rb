@@ -45,8 +45,6 @@ def show_character_movies(character)
   film_array = get_character_movies_from_api(character)
   neat_films = parse_character_movies(film_array)
   print_movies(neat_films)
-  binding.pry
-  "bye"
 end
 
 ## BONUS
