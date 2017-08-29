@@ -3,18 +3,32 @@ require 'json'
 require 'pry'
 
 def get_character_movies_from_api(character)
+
+  # do (get an api response)
+    # if char present return char hash
+  # while (api response has a next page)
+
+
   counter =   1
   found = nil
-  loop do
+
+  begin
     all_characters = RestClient.get("http://www.swapi.co/api/people/?page=#{counter}")
     character_array = JSON.parse(all_characters)["results"] #returns array of characters
     found = character_array.find do |person|
-      character == person["name"]
+      character == person["name"].downcase
     end #Returns array of URLs
+
+    if found
+      return found["films"]
+    end
+
     counter += 1
-    break if found != nil
-  end
-  found != nil ? return found["films"] : return nil
+
+    # break if found || JSON.parse(all_characters)["next"].nil?
+  end while (!JSON.parse(all_characters)["next"].nil?)
+
+  nil
 end
 
 def parse_character_movies(film_array)
@@ -38,9 +52,13 @@ end
 
 def show_character_movies(character)
   film_array = get_character_movies_from_api(character) #Returns array of URLs
-  film_array neat_films = parse_character_movies(film_array) #Returns Array of hashes
-                                                  #e.g.[{1=>"A New Hope"},2=>"Empire Strikes Back"}]
-  print_movies(neat_films)
+
+  if film_array
+    neat_films = parse_character_movies(film_array) #Returns Array of hashes
+    print_movies(neat_films)
+  else
+    puts "No character found."
+  end
 end
 
 ## BONUS
