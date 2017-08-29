@@ -4,17 +4,9 @@ require 'pry'
 
 def get_character_movies_from_api(character)
 
-  # do (get an api response)
-    # if char present return char hash
-  # while (api response has a next page)
-
-
-  counter =   1
-  found = nil
-
-  begin
-    all_characters = RestClient.get("http://www.swapi.co/api/people/?page=#{counter}")
-    character_array = JSON.parse(all_characters)["results"] #returns array of characters
+  response = JSON.parse(RestClient.get("http://www.swapi.co/api/people/"))
+  while (results)
+    character_array = response["results"]
     found = character_array.find do |person|
       character == person["name"].downcase
     end #Returns array of URLs
@@ -22,13 +14,10 @@ def get_character_movies_from_api(character)
     if found
       return found["films"]
     end
-
-    counter += 1
-
+    response = response["next"] ? JSON.parse(RestClient.get(response["next"])) : nil
     # break if found || JSON.parse(all_characters)["next"].nil?
-  end while (!JSON.parse(all_characters)["next"].nil?)
-
-  nil
+  end
+  response
 end
 
 def parse_character_movies(film_array)
