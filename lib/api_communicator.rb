@@ -1,11 +1,12 @@
 require 'rest-client'
 require 'json'
 require 'pry'
+require_relative "../lib/command_line_interface.rb"
 
 def get_character_movies_from_api(character)
 
   response = JSON.parse(RestClient.get("http://www.swapi.co/api/people/"))
-  while (results)
+  while (response)
     character_array = response["results"]
     found = character_array.find do |person|
       character == person["name"].downcase
@@ -14,8 +15,8 @@ def get_character_movies_from_api(character)
     if found
       return found["films"]
     end
+
     response = response["next"] ? JSON.parse(RestClient.get(response["next"])) : nil
-    # break if found || JSON.parse(all_characters)["next"].nil?
   end
   response
 end
@@ -46,8 +47,19 @@ def show_character_movies(character)
     neat_films = parse_character_movies(film_array) #Returns Array of hashes
     print_movies(neat_films)
   else
-    puts "No character found."
+    puts "#{character} not found."
+    puts "Would you like to try again? (y/n)"
+    if (gets.chomp.downcase == 'n')
+      return
+    else
+      run
+    end
   end
+end
+
+def run
+  character = get_character_from_user
+  show_character_movies(character)
 end
 
 ## BONUS
