@@ -5,8 +5,14 @@ require 'pry'
 def get_character_movies_from_api(character)
   #make the web request
   all_characters = RestClient.get('http://www.swapi.co/api/people/')
-  character_hash = JSON.parse(all_characters)
-  
+  character_array = JSON.parse(all_characters)["results"] #returns array of characters
+  character_array.find do |person|
+    character == person["name"]
+  end["films"]
+
+
+
+
   # iterate over the character hash to find the collection of `films` for the given
   #   `character`
   # collect those film API urls, make a web request to each URL to get the info
@@ -18,13 +24,29 @@ def get_character_movies_from_api(character)
   #  of movies by title. play around with puts out other info about a given film.
 end
 
-def parse_character_movies(films_hash)
-  # some iteration magic and puts out the movies in a nice list
+def parse_character_movies(film_array)
+  neat_films = []
+  film_array.each do |url|
+    movie = RestClient.get("#{url}")
+    neat_films.push(JSON.parse(movie)["title"])
+  end
+  neat_films
+end
+
+def print_movies(movie_array)
+  counter = 1
+  movie_array.each do |movie|
+    puts "#{counter} #{movie}"
+    counter += 1
+  end
 end
 
 def show_character_movies(character)
-  films_hash = get_character_movies_from_api(character)
-  parse_character_movies(films_hash)
+  film_array = get_character_movies_from_api(character)
+  neat_films = parse_character_movies(film_array)
+  print_movies(neat_films)
+  binding.pry
+  "bye"
 end
 
 ## BONUS
